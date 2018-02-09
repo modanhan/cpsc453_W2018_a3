@@ -226,7 +226,7 @@ double xclick = 0, yclick = 0;
 float scalar = 1.0;
 bool rel = false;
 
-void RenderTexture(Geometry *geometry, MyTexture *tex)
+void RenderTexture(Geometry *fbogeo, MyTexture *tex)
 {
 	// clear screen to a dark grey colour
 //	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -239,6 +239,8 @@ void RenderTexture(Geometry *geometry, MyTexture *tex)
 	glUseProgram(program);
 	glBindFramebuffer(GL_FRAMEBUFFER, oldText.fboID);
 	
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 	glBindTexture(GL_TEXTURE_2D, tex->textureID);
 	
 //cout<<oldText.fboID<<" "<<oldText.textureID<<endl;
@@ -255,7 +257,7 @@ void RenderTexture(Geometry *geometry, MyTexture *tex)
 	glUniform1i(glGetUniformLocation(program,"level"), level);
 	glUniform1i(glGetUniformLocation(program,"hori"), 1);
 	
-	glBindVertexArray(geometry->vertexArray);
+	glBindVertexArray(fbogeo->vertexArray);
 
 //	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, oldText.textureID, 0);	
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -281,7 +283,7 @@ void RenderTexture(Geometry *geometry, MyTexture *tex)
 }
 
 
-void RenderScene(Geometry *geometry, MyTexture *tex, GLuint program)
+void RenderScene(Geometry *geometry,Geometry *fbogeo, MyTexture *tex, GLuint program)
 {
 	// clear screen to a dark grey colour
 //	if (mode !=2 && filt !=5) {
@@ -291,7 +293,7 @@ void RenderScene(Geometry *geometry, MyTexture *tex, GLuint program)
 	// bind our shader program and the vertex array object containing our
 	// scene geometry, then tell OpenGL to draw our geometry
 	if (mode == 3) {
-		RenderTexture(geometry, tex);
+		RenderTexture(fbogeo, tex);
 //		glBindTexture(GL_TEXTURE_2D, oldText[pic].textureID);
 		glBindTexture(GL_TEXTURE_2D, oldText.textureID);
 		
@@ -724,13 +726,28 @@ int main(int argc, char *argv[])
 		vec2( 1.0f,  1.0f ),
 		vec2( 1.0f, .0f )
 	};
+	vec2 fbos[] = {
+		vec2( -1.0f, -1.0f ),
+		vec2( 1.0f,  1.0f ),
+		vec2( -1.0f, 1.0f ),
+		vec2( -1.0f, -1.0f ),
+		vec2( 1.0f,  1.0f ),
+		vec2( 1.0f, -1.0f )
+	};
+	
 
 	// call function to create and fill buffers with geometry data
 	Geometry geometry;
+	Geometry fbogeo;
 	if (!InitializeVAO(&geometry))
 		cout << "Program failed to intialize geometry!" << endl;
 
 	if(!LoadGeometry(&geometry, vertices, colours, textures, 6))
+		cout << "Failed to load geometry" << endl;
+	if (!InitializeVAO(&fbogeo))
+		cout << "Program failed to intialize geometry!" << endl;
+
+	if(!LoadGeometry(&fbogeo, fbos, colours, textures, 6))
 		cout << "Failed to load geometry" << endl;
 
 	glUseProgram(program);
@@ -759,6 +776,9 @@ int main(int argc, char *argv[])
 	vertices[5] = vec2( cos(th)*(corners[6]*scalar+dx)-sin(th)*(corners[7]*scalar+dy), sin(th)*(corners[6]*scalar+dx)+cos(th)*(corners[7]*scalar+dy) );
 	glActiveTexture(GL_TEXTURE0 + 0);
 	glBindTexture(GL_TEXTURE_2D, texs[pic].textureID);		
+	if (mode == 3)
+		if(!LoadGeometry(&fbogeo, fbos, colours, textures, 6))
+			cout << "Failed to load geometry" << endl;
 	if(!LoadGeometry(&geometry, vertices, colours, textures, 6))
 		cout << "Failed to load geometry" << endl;
 
@@ -772,14 +792,14 @@ int main(int argc, char *argv[])
 //			RenderTexture(&geometry);
 //			cout << "click" << endl;
 //		}
-		RenderScene(&geometry, &texs[pic], program);
+		RenderScene(&geometry, &fbogeo, &texs[pic], program);
 //		if (mode ==2 && filt ==5) 
 //			RenderScene(&geometry, &border, program);
 		glfwSwapBuffers(window);
 
 		glfwPollEvents();
 
-		rel = false;
+//		rel = false;
 	}
 
 	// clean up allocated resources before exit
