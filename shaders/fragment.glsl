@@ -118,8 +118,8 @@ void main(void)
 	}
 	else if (mode == 3) {
 		if (filt!=0) {
-			int bound = (gSize-1)/2;
-			float sigma = .15f+0.45*filt;//0.665f+.25f*filt;//+0.2f*filt;//+filt/bound;
+			int bound = 3;//(gSize-1)/2;
+			float sigma = .15f+0.45*7;//filt;//0.665f+.25f*filt;//+0.2f*filt;//+filt/bound;
 			float total = 0;
 			vec4 blur = vec4(0);//texture(ourTexture, -UV);//vec4(vec3(.2f,.2f,.2f),0.0f);// = 0*texture(ourTexture, UV);
 			for (int i=-bound; i<=bound; i++) {
@@ -134,6 +134,7 @@ void main(void)
 		//			if (total < 1.0f)
 		//				FragmentColour = vec4(Colour,0.0);
 			FragmentColour = blur;
+//			FragmentColour = texture(ourTexture, UV)+vec4(0.5);
 		}
 		else
 			FragmentColour = texture(ourTexture, UV);

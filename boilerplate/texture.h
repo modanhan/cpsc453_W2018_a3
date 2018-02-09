@@ -11,6 +11,7 @@ struct MyTexture
 	GLuint target;
 	int width;
 	int height;
+	GLuint fboID;
 
 	// initialize object names to zero (OpenGL reserved value)
 	MyTexture();

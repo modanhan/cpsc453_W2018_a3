@@ -226,7 +226,7 @@ double xclick = 0, yclick = 0;
 float scalar = 1.0;
 bool rel = false;
 
-void RenderTexture(Geometry *geometry)
+void RenderTexture(Geometry *geometry, MyTexture *tex)
 {
 	// clear screen to a dark grey colour
 //	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -236,23 +236,28 @@ void RenderTexture(Geometry *geometry)
 	// scene geometry, then tell OpenGL to draw our geometry
 //	glBindTexture(GL_TEXTURE_2D, tex->textureID);
 //	glBindFramebuffer(GL_FRAMEBUFFER, oldText[pic].textureID);
-	glBindFramebuffer(GL_FRAMEBUFFER, oldText.textureID);
-
-	
 	glUseProgram(program);
+	glBindFramebuffer(GL_FRAMEBUFFER, oldText.fboID);
+	
+	glBindTexture(GL_TEXTURE_2D, tex->textureID);
+	
+//cout<<oldText.fboID<<" "<<oldText.textureID<<endl;
+//cout<<tex->textureID<<endl;
+	
 	glUniform1i(glGetUniformLocation(program,"mode"), mode);
 	glUniform1i(glGetUniformLocation(program,"filt"), filt);
 //	glUniform1i(glGetUniformLocation(program,"w"), oldText[pic].width);
-	glUniform1i(glGetUniformLocation(program,"w"), oldText.width);
+//	glUniform1i(glGetUniformLocation(program,"w"), oldText.width);
 	glUniform1i(glGetUniformLocation(program,"w"), oldText.width);
 //	glUniform1i(glGetUniformLocation(program,"h"), oldText[pic].height);
 	glUniform1i(glGetUniformLocation(program,"h"), oldText.height);
 	glUniform1i(glGetUniformLocation(program,"gSize"), gaus);
 	glUniform1i(glGetUniformLocation(program,"level"), level);
 	glUniform1i(glGetUniformLocation(program,"hori"), 1);
+	
 	glBindVertexArray(geometry->vertexArray);
 
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, oldText.textureID, 0);	
+//	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, oldText.textureID, 0);	
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	
 //	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -285,12 +290,24 @@ void RenderScene(Geometry *geometry, MyTexture *tex, GLuint program)
 
 	// bind our shader program and the vertex array object containing our
 	// scene geometry, then tell OpenGL to draw our geometry
-//	if (mode == 3) {
-//		RenderTexture(geometry);
+	if (mode == 3) {
+		RenderTexture(geometry, tex);
 //		glBindTexture(GL_TEXTURE_2D, oldText[pic].textureID);
-//		glBindTexture(GL_TEXTURE_2D, oldText.textureID);
-//	}
-//	else
+		glBindTexture(GL_TEXTURE_2D, oldText.textureID);
+		
+		glUseProgram(program);
+		glUniform1i(glGetUniformLocation(program,"mode"), mode);
+		glUniform1i(glGetUniformLocation(program,"filt"), filt);
+		glUniform1i(glGetUniformLocation(program,"w"), tex->width);
+		glUniform1i(glGetUniformLocation(program,"h"), tex->height);
+		glUniform1i(glGetUniformLocation(program,"gSize"), gaus);
+		glUniform1i(glGetUniformLocation(program,"level"), level);
+		glUniform1i(glGetUniformLocation(program,"hori"), 0);
+		glBindVertexArray(geometry->vertexArray);
+		glDrawArrays(GL_TRIANGLES, 0, geometry->elementCount);
+	}
+	else
+	{
 	glBindTexture(GL_TEXTURE_2D, tex->textureID);
 //	glBindFramebuffer(GL_FRAMEBUFFER, oldText.textureID);
 	
@@ -305,7 +322,7 @@ void RenderScene(Geometry *geometry, MyTexture *tex, GLuint program)
 	glBindVertexArray(geometry->vertexArray);
 
 	
-	glDrawArrays(GL_TRIANGLES, 0, geometry->elementCount);
+	glDrawArrays(GL_TRIANGLES, 0, geometry->elementCount);}
 //	cout << geometry->elementCount << endl;
 //	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -508,9 +525,9 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		scalar=1;
 		filt=0;
 	}
-//	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
-//		if (mode == 3)
-//			rel = true;
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+		if (mode == 3)
+			rel = true;
 //	cout << filt << "-" << gaus << endl; 
 }
 
@@ -668,11 +685,11 @@ int main(int argc, char *argv[])
 	if (!InitializeTexture(&border, "blood2.png", GL_TEXTURE_2D))
 			cout << "Program failed to initialize texture" << endl;
 
-/*	if (!InitializeFBO(&oldText, GL_TEXTURE_2D))
+	if (!InitializeFBO(&oldText, GL_TEXTURE_2D))
 		cout << "Program failed to initialize rendered texture" << endl;
 	else
 		cout << "good fbo" << endl;
-*/
+
 
 	float img_h = (float)texs[pic].height/2;
 	float img_w = (float)texs[pic].width/2;
@@ -762,7 +779,7 @@ int main(int argc, char *argv[])
 
 		glfwPollEvents();
 
-//		rel = false;
+		rel = false;
 	}
 
 	// clean up allocated resources before exit

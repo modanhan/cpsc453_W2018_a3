@@ -89,14 +89,13 @@ bool InitializeTexture(MyTexture* texture, const char* filename, GLuint target)
 bool InitializeFBO(MyTexture* texture, GLuint target)
 {
 //	int numComponents;
-	GLuint fbName = 0;
 //	texture->textureID = fbName;
-	glGenFramebuffers(1, &fbName);
-	GLuint renderedTexture;
-	glGenTextures(1, &renderedTexture);
+	glGenFramebuffers(1, &texture->fboID);
+	glBindFramebuffer(GL_FRAMEBUFFER, texture->fboID);
+	glGenTextures(1, &texture->textureID);
 
 	// "Bind" the newly created texture : all future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, renderedTexture);
+	glBindTexture(GL_TEXTURE_2D, texture->textureID);
 
 	// Give an empty image to OpenGL ( the last "0" )
 	glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1024, 768, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
@@ -105,14 +104,18 @@ bool InitializeFBO(MyTexture* texture, GLuint target)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
-	GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-	glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+//	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->textureID, 0);
+//	GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+//	glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+//	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		return false;
 //		return !CheckGLErrors( (string("Loading texture: ")+filename).c_str() );
 //	}
-	return true; //error
+	return !CheckGLErrors( ("fbo error") ); //error
 }
 
 
