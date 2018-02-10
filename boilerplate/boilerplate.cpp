@@ -374,6 +374,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		filt = 3;
 		gaus = 7;
 	}
+	if (key == GLFW_KEY_5 && action == GLFW_PRESS && mode != 3) {
+		mode = 4; 
+		filt = 0;
+		gaus = 3;
+	}
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
 		if (mode == 0) {
 			if (filt == 5) 
@@ -413,13 +418,13 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 				filt = filt + 5;
 				gaus = gaus + 10;
 			}
-/*			if (limit == 25) 
-				limit = 0;
-			else
-				limit++;
-			gaus2 = 1;*/
-//			RenderTexture();
 		}
+		if (mode == 4) {
+			if (filt == 3) 
+				filt = 0;
+			else
+				filt++;
+		}		
 	}
 	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
 		if (mode == 0) {
@@ -460,15 +465,13 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 				filt = filt - 5;
 				gaus = gaus - 10;
 			}
-/*			if (limit == 0) { 
-				limit = 25;
-			}
-			else {
-				limit--;
-				gaus2 = -1;
-			}*/
-//			RenderTexture();
 		}
+		if (mode == 4) {
+			if (filt == 0) 
+				filt = 3;
+			else
+				filt--;
+		}		
 	}
 	
 	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
@@ -716,7 +719,7 @@ int main(int argc, char *argv[])
 		vec3( 0.0f, 0.0f, 1.0f ),
 		vec3( 1.0f, 0.0f, 0.0f ),
 		vec3( 0.0f, 1.0f, 0.0f ),
-		vec3( 0.0f, 0.0f, 1.0f )
+		vec3( 0.0f, 0.0f, 0.0f )
 	};
 	vec2 textures[] = {
 		vec2( .0f, .0f ),

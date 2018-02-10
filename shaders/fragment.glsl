@@ -139,6 +139,31 @@ void main(void)
 		else
 			FragmentColour = texture(ourTexture, UV);
 	}
+	else if (mode == 4) {
+		
+		if (filt == 1) 
+			FragmentColour = 
+				vec4(vec4(Colour,0).r*.299f +vec4(Colour,0).g*.587f +vec4(Colour,0).b*.114f);
+		else if (filt == 2)
+			FragmentColour = 
+				vec4(vec4(Colour,0).r/3.0f +vec4(Colour,0).g/3.0f +vec4(Colour,0).b/3.0);
+		else if (filt == 3)
+			FragmentColour =	
+				vec4(vec4(Colour,0).r*.213f +vec4(Colour,0).g*.715f +vec4(Colour,0).b*.072f);
+		else
+			FragmentColour = vec4(Colour,0);
+/*		else if (filt == 4)
+			FragmentColour =
+				vec4(1.0f) - vec4(Colour,0);
+		else if (filt == 5) {
+			float intensity = texture(borderTexture,UV).r +texture(borderTexture,UV).g +texture(borderTexture,UV).b;
+			if (intensity == 0)
+				FragmentColour = vec4(1.0f)-texture(Colour, UV);
+			else
+				FragmentColour = texture(borderTexture, UV);
+		}*/
+			
+	}
 	else{
 		FragmentColour = texture(ourTexture, UV);
 	}
