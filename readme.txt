@@ -45,12 +45,3 @@ SCENE 4	 (BONUS)
 another different font scrolling
 SCENE 5
 Curve adjustment (BONUS)
-	*February 28 ~11:00pm
-		shortly after i completed the code, I went to scan my letter fonts to trace
-		with this bonus. however I started getting Error in `./boilerplate.out' as
-		provided with the screenshot in this folder. I was able to meet the 
-		requirements of the second bonus, and move and adjsut the points accordingly.
-		However after I scanned my writing, I'm not sure what happened, but the program
-		aborts after several control points have been added. Not sure how this happened
-		as nothing has been changed. But John was in the labs and witnessed the
-		capability of adding, removing and dragging control points.
